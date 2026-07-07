@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: distributed-notification-service
+
+  profiles:
+    active: dev
+
+server:
+  port: 8080
