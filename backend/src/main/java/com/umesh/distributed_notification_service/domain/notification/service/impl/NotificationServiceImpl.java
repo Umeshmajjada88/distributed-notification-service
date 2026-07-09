@@ -6,9 +6,16 @@ import com.umesh.distributed_notification_service.domain.notification.dto.reques
 import com.umesh.distributed_notification_service.domain.notification.dto.response.NotificationResponse;
 import com.umesh.distributed_notification_service.domain.notification.entity.Notification;
 import com.umesh.distributed_notification_service.domain.notification.enums.NotificationStatus;
+import com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent;
+import com.umesh.distributed_notification_service.domain.notification.event.mapper.NotificationEventMapper;
+import com.umesh.distributed_notification_service.domain.notification.event.publisher.NotificationEventPublisher;
 import com.umesh.distributed_notification_service.domain.notification.mapper.NotificationMapper;
 import com.umesh.distributed_notification_service.domain.notification.repository.NotificationRepository;
 import com.umesh.distributed_notification_service.domain.notification.service.NotificationService;
+import com.umesh.distributed_notification_service.domain.outbox.entity.OutboxEvent;
+import com.umesh.distributed_notification_service.domain.outbox.mapper.OutboxMapper;
+import com.umesh.distributed_notification_service.domain.outbox.service.OutboxService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +32,36 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final IdGenerator idGenerator;
+    private final NotificationEventPublisher notificationEventPublisher;
+    private final NotificationEventMapper notificationEventMapper;
+
+    private final OutboxMapper outboxMapper;
+
+    private final OutboxService outboxService;
 
     @Override
-    public NotificationResponse createNotification(CreateNotificationRequest request) {
+public NotificationResponse createNotification(
+        CreateNotificationRequest request) {
 
-        Notification notification = initializeNotification(request);
+    Notification notification = initializeNotification(request);
 
-        Notification savedNotification = saveNotification(notification);
+    Notification savedNotification =
+            notificationRepository.save(notification);
 
-        return notificationMapper.toResponse(savedNotification);
-    }
+    NotificationEvent event =
+            notificationEventMapper.toEvent(savedNotification);
+
+    OutboxEvent outboxEvent =
+            outboxMapper.toOutboxEvent(
+                    "NOTIFICATION",
+                    savedNotification.getId().toString(),
+                    "NOTIFICATION_CREATED",
+                    event);
+
+    outboxService.save(outboxEvent);
+
+    return notificationMapper.toResponse(savedNotification);
+}
 
     @Override
     @Transactional(readOnly = true)
