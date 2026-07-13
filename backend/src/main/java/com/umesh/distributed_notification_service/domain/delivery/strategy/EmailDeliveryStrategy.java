@@ -17,22 +17,29 @@ public class EmailDeliveryStrategy implements NotificationDeliveryStrategy {
     @Override
     public void deliver(NotificationEvent event) {
 
-        log.info("""
+        throw new RuntimeException("Simulated email delivery failure");
 
-                ================ EMAIL =================
-
-                Event Id      : {}
-                Notification  : {}
-                User Id       : {}
-                Subject       : {}
-
-                Email delivered successfully.
-
-                =========================================
-                """,
-                event.getEventId(),
-                event.getNotificationId(),
-                event.getUserId(),
-                event.getSubject());
     }
+
+    // @Override
+    // public void deliver(NotificationEvent event) {
+
+    //     log.info("""
+
+    //             ================ EMAIL =================
+
+    //             Event Id      : {}
+    //             Notification  : {}
+    //             User Id       : {}
+    //             Subject       : {}
+
+    //             Email delivered successfully.
+
+    //             =========================================
+    //             """,
+    //             event.getEventId(),
+    //             event.getNotificationId(),
+    //             event.getUserId(),
+    //             event.getSubject());
+    // }
 }

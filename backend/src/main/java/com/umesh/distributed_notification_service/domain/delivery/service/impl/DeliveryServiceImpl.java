@@ -9,6 +9,8 @@ import com.umesh.distributed_notification_service.domain.notification.entity.Not
 import com.umesh.distributed_notification_service.domain.notification.enums.NotificationStatus;
 import com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent;
 import com.umesh.distributed_notification_service.domain.notification.repository.NotificationRepository;
+import com.umesh.distributed_notification_service.domain.retry.service.RetryService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final NotificationRepository notificationRepository;
 
     private final NotificationDeliveryService notificationDeliveryService;
+
+    private final RetryService retryService;
 
     @Override
     @Transactional
@@ -64,14 +68,25 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         } catch (Exception ex) {
 
-            delivery.setStatus(DeliveryAttemptStatus.FAILED);
-            delivery.setCompletedAt(LocalDateTime.now());
-            delivery.setErrorMessage(ex.getMessage());
+                log.error(
+                                "Notification delivery failed. eventId={}",
+                                event.getEventId(),
+                                ex);
 
-            notification.setStatus(NotificationStatus.FAILED);
+                delivery.setStatus(DeliveryAttemptStatus.FAILED);
+                delivery.setCompletedAt(LocalDateTime.now());
+                delivery.setErrorMessage(ex.getMessage());
 
-            throw ex;
+                notificationDeliveryService.save(delivery);
 
+                retryService.retry(notification);
+
+                log.warn(
+                                "Notification {} scheduled for retry. Retry count={}",
+                                notification.getId(),
+                                notification.getRetryCount());
+
+                return;
         } finally {
 
             notificationRepository.save(notification);

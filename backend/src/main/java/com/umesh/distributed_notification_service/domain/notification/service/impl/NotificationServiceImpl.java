@@ -12,6 +12,8 @@ import com.umesh.distributed_notification_service.domain.notification.event.publ
 import com.umesh.distributed_notification_service.domain.notification.mapper.NotificationMapper;
 import com.umesh.distributed_notification_service.domain.notification.repository.NotificationRepository;
 import com.umesh.distributed_notification_service.domain.notification.service.NotificationService;
+import com.umesh.distributed_notification_service.domain.outbox.constants.AggregateType;
+import com.umesh.distributed_notification_service.domain.outbox.constants.NotificationEventType;
 import com.umesh.distributed_notification_service.domain.outbox.entity.OutboxEvent;
 import com.umesh.distributed_notification_service.domain.outbox.mapper.OutboxMapper;
 import com.umesh.distributed_notification_service.domain.outbox.service.OutboxService;
@@ -53,9 +55,9 @@ public NotificationResponse createNotification(
 
     OutboxEvent outboxEvent =
             outboxMapper.toOutboxEvent(
-                    "NOTIFICATION",
+                    AggregateType.NOTIFICATION,
                     savedNotification.getId().toString(),
-                    "NOTIFICATION_CREATED",
+                    NotificationEventType.NOTIFICATION_CREATED,
                     event);
 
     outboxService.save(outboxEvent);

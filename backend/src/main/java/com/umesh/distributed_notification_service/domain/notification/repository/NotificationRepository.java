@@ -21,4 +21,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             NotificationStatus status,
             LocalDateTime scheduledAt);
 
+    List<Notification> findByStatusAndNextRetryAtLessThanEqual(
+            NotificationStatus status,
+            LocalDateTime time);
+
+
 }

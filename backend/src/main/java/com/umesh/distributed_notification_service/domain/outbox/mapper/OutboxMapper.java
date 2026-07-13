@@ -1,10 +1,14 @@
 package com.umesh.distributed_notification_service.domain.outbox.mapper;
 
-import com.umesh.distributed_notification_service.common.constants.KafkaTopics;
+// import com.umesh.distributed_notification_service.common.constants.KafkaTopics;
 import com.umesh.distributed_notification_service.common.serialization.JsonSerializer;
 import com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent;
+import com.umesh.distributed_notification_service.domain.outbox.constants.AggregateType;
+import com.umesh.distributed_notification_service.domain.outbox.constants.NotificationEventType;
 import com.umesh.distributed_notification_service.domain.outbox.entity.OutboxEvent;
 import com.umesh.distributed_notification_service.domain.outbox.enums.OutboxStatus;
+import com.umesh.distributed_notification_service.infrastructure.kafka.resolver.EventTopicResolver;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,18 +17,19 @@ import org.springframework.stereotype.Component;
 public class OutboxMapper {
 
     private final JsonSerializer jsonSerializer;
+    private final EventTopicResolver topicResolver;
 
     public OutboxEvent toOutboxEvent(
-            String aggregateType,
+            AggregateType aggregateType,
             String aggregateId,
-            String eventType,
+            NotificationEventType eventType,
             NotificationEvent event) {
 
         return OutboxEvent.builder()
-                .aggregateType(aggregateType)
+                .aggregateType(aggregateType.name())
                 .aggregateId(aggregateId)
-                .eventType(eventType)
-                .topic(KafkaTopics.NOTIFICATION_CREATED) // <-- Fix
+                .eventType(eventType.name())
+                .topic(topicResolver.resolve(eventType))
                 .payload(jsonSerializer.serialize(event))
                 .status(OutboxStatus.PENDING)
                 .retryCount(0)

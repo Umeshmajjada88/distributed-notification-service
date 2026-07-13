@@ -56,4 +56,7 @@ public class Notification extends BaseEntity {
     @Column(name = "scheduled_at")
     private LocalDateTime scheduledAt;
 
+    @Column(name = "next_retry_at")
+    private LocalDateTime nextRetryAt;
+
 }

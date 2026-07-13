@@ -5,9 +5,6 @@ public final class KafkaTopics {
     private KafkaTopics() {
     }
 
-    /*
-     * Notification Topics
-     */
     public static final String NOTIFICATION_CREATED = "notification.v1.created";
 
     public static final String NOTIFICATION_RETRY = "notification.v1.retry";
