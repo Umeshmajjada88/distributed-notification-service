@@ -12,17 +12,37 @@ on:
       - master
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+
+        env:
+          POSTGRES_DB: notification_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root123
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd="pg_isready -U postgres -d notification_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     defaults:
       run:
         working-directory: backend
 
-    steps:
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/notification_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root123
 
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -35,6 +55,13 @@ jobs:
 
       - name: Make Maven Wrapper Executable
         run: chmod +x mvnw
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
 
       - name: Compile
         run: ./mvnw clean compile
