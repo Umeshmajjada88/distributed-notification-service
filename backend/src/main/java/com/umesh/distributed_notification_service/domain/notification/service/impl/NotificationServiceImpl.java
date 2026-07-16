@@ -17,6 +17,7 @@ import com.umesh.distributed_notification_service.domain.outbox.constants.Notifi
 import com.umesh.distributed_notification_service.domain.outbox.entity.OutboxEvent;
 import com.umesh.distributed_notification_service.domain.outbox.mapper.OutboxMapper;
 import com.umesh.distributed_notification_service.domain.outbox.service.OutboxService;
+import com.umesh.distributed_notification_service.infrastructure.metrics.NotificationMetrics;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final OutboxService outboxService;
 
+    private final NotificationMetrics notificationMetrics;
+
     @Override
 public NotificationResponse createNotification(
         CreateNotificationRequest request) {
@@ -61,6 +64,8 @@ public NotificationResponse createNotification(
                     event);
 
     outboxService.save(outboxEvent);
+
+    notificationMetrics.incrementCreated();
 
     return notificationMapper.toResponse(savedNotification);
 }

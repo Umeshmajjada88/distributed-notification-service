@@ -5,6 +5,21 @@ spring:
     username: postgres
     password: root123
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+
+    username: umeshmajjada88@gmail.com
+    password: psjk gehq jikv lcst
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
   jpa:
     open-in-view: false
     hibernate:
@@ -67,3 +82,9 @@ notification:
   retry:
     max-attempts: 3
     retry-delay-ms: 5000
+
+  email:
+    default-recipient: umeshmajjada88@gmail.com
+
+  sms:
+    default-recipient: +919440128127

@@ -10,6 +10,7 @@ import com.umesh.distributed_notification_service.domain.notification.enums.Noti
 import com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent;
 import com.umesh.distributed_notification_service.domain.notification.repository.NotificationRepository;
 import com.umesh.distributed_notification_service.domain.retry.service.RetryService;
+import com.umesh.distributed_notification_service.infrastructure.metrics.NotificationMetrics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,8 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final NotificationDeliveryService notificationDeliveryService;
 
     private final RetryService retryService;
+
+    private final NotificationMetrics notificationMetrics;
 
     @Override
     @Transactional
@@ -66,6 +69,8 @@ public class DeliveryServiceImpl implements DeliveryService {
 
             notification.setStatus(NotificationStatus.SENT);
 
+            notificationMetrics.incrementSent();
+
         } catch (Exception ex) {
 
                 log.error(
@@ -74,6 +79,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                                 ex);
 
                 delivery.setStatus(DeliveryAttemptStatus.FAILED);
+                notificationMetrics.incrementFailed();
                 delivery.setCompletedAt(LocalDateTime.now());
                 delivery.setErrorMessage(ex.getMessage());
 

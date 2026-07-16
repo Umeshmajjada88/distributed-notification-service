@@ -1,5 +1,6 @@
 package com.umesh.distributed_notification_service.domain.retry.service;
 
+import com.umesh.distributed_notification_service.config.retry.RetryProperties;
 import com.umesh.distributed_notification_service.domain.notification.entity.Notification;
 import com.umesh.distributed_notification_service.domain.notification.enums.NotificationStatus;
 import com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent;
@@ -11,6 +12,7 @@ import com.umesh.distributed_notification_service.domain.outbox.mapper.OutboxMap
 import com.umesh.distributed_notification_service.domain.outbox.service.OutboxService;
 import com.umesh.distributed_notification_service.domain.retry.policy.RetryPolicy;
 import com.umesh.distributed_notification_service.domain.retry.service.impl.RetryServiceImpl;
+import com.umesh.distributed_notification_service.infrastructure.metrics.NotificationMetrics;
 import com.umesh.distributed_notification_service.domain.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,20 +30,26 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RetryServiceTest {
 
-    @Mock
-    private NotificationRepository notificationRepository;
+        @Mock
+        private NotificationRepository notificationRepository;
 
-    @Mock
-    private RetryPolicy retryPolicy;
+        @Mock
+        private RetryPolicy retryPolicy;
 
-    @Mock
-    private NotificationEventMapper eventMapper;
+        @Mock
+        private NotificationEventMapper eventMapper;
 
-    @Mock
-    private OutboxMapper outboxMapper;
+        @Mock
+        private OutboxMapper outboxMapper;
 
-    @Mock
-    private OutboxService outboxService;
+        @Mock
+        private OutboxService outboxService;
+
+        @Mock
+        private NotificationMetrics notificationMetrics;
+
+        @Mock
+        private RetryProperties retryProperties;
 
     @InjectMocks
     private RetryServiceImpl retryService;

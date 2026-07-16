@@ -16,6 +16,8 @@ import com.umesh.distributed_notification_service.domain.outbox.constants.Notifi
 import com.umesh.distributed_notification_service.domain.outbox.entity.OutboxEvent;
 import com.umesh.distributed_notification_service.domain.outbox.mapper.OutboxMapper;
 import com.umesh.distributed_notification_service.domain.outbox.service.OutboxService;
+import com.umesh.distributed_notification_service.infrastructure.metrics.NotificationMetrics;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +50,9 @@ class NotificationServiceTest {
 
     @Mock
     private OutboxService outboxService;
+
+    @Mock
+    private NotificationMetrics notificationMetrics;
 
     @InjectMocks
     private NotificationServiceImpl notificationService;

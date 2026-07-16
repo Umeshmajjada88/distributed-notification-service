@@ -8,6 +8,8 @@ import com.umesh.distributed_notification_service.domain.notification.enums.Noti
 import com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent;
 import com.umesh.distributed_notification_service.domain.notification.repository.NotificationRepository;
 import com.umesh.distributed_notification_service.domain.retry.service.RetryService;
+import com.umesh.distributed_notification_service.infrastructure.metrics.NotificationMetrics;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -36,6 +38,9 @@ class DeliveryServiceTest {
 
     @Mock
     private com.umesh.distributed_notification_service.domain.delivery.strategy.NotificationDeliveryStrategy strategy;
+
+    @Mock
+        private NotificationMetrics notificationMetrics;
 
     @InjectMocks
     private DeliveryServiceImpl deliveryService;

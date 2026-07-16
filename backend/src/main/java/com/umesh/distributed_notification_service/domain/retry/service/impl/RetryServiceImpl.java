@@ -13,6 +13,8 @@ import com.umesh.distributed_notification_service.domain.outbox.mapper.OutboxMap
 import com.umesh.distributed_notification_service.domain.outbox.service.OutboxService;
 import com.umesh.distributed_notification_service.domain.retry.policy.RetryPolicy;
 import com.umesh.distributed_notification_service.domain.retry.service.RetryService;
+import com.umesh.distributed_notification_service.infrastructure.metrics.NotificationMetrics;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RetryServiceImpl implements RetryService {
 
-    private final RetryProperties retryProperties;
-
     private final NotificationRepository notificationRepository;
 
     private final NotificationEventMapper eventMapper;
@@ -35,6 +35,8 @@ public class RetryServiceImpl implements RetryService {
     private final OutboxService outboxService;
     private final RetryPolicy retryPolicy;
 
+    private final NotificationMetrics notificationMetrics;
+
     @Override
     @Transactional
     public void retry(Notification notification) {
@@ -43,32 +45,33 @@ public class RetryServiceImpl implements RetryService {
 
         if (!retryPolicy.shouldRetry(notification.getRetryCount())) {
 
-    notification.setStatus(NotificationStatus.FAILED);
+                notification.setStatus(NotificationStatus.FAILED);
 
-    notification.setNextRetryAt(null);
+                notification.setNextRetryAt(null);
 
-    notificationRepository.save(notification);
+                notificationRepository.save(notification);
 
-    NotificationEvent event =
-            eventMapper.toEvent(notification);
+                notificationMetrics.incrementDlq();
 
-    OutboxEvent outboxEvent =
-            outboxMapper.toOutboxEvent(
-                    AggregateType.NOTIFICATION,
-                    notification.getId().toString(),
-                    NotificationEventType.NOTIFICATION_FAILED,
-                    event);
+                NotificationEvent event = eventMapper.toEvent(notification);
 
-    outboxService.save(outboxEvent);
+                OutboxEvent outboxEvent = outboxMapper.toOutboxEvent(
+                                AggregateType.NOTIFICATION,
+                                notification.getId().toString(),
+                                NotificationEventType.NOTIFICATION_FAILED,
+                                event);
 
-    log.error(
-            "Notification {} exceeded maximum retry attempts. Routed to DLQ.",
-            notification.getId());
+                outboxService.save(outboxEvent);
 
-    return;
+                log.error(
+                                "Notification {} exceeded maximum retry attempts. Routed to DLQ.",
+                                notification.getId());
+
+                return;
 }
 
         notification.setStatus(NotificationStatus.RETRYING);
+        notificationMetrics.incrementRetry();
 
         notification.setNextRetryAt(
                 retryPolicy.nextRetryTime(
