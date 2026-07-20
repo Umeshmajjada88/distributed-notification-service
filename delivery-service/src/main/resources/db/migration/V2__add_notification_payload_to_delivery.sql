@@ -1,0 +1,5 @@
+ALTER TABLE delivery
+ADD COLUMN subject VARCHAR(255);
+
+ALTER TABLE delivery
+ADD COLUMN message TEXT;

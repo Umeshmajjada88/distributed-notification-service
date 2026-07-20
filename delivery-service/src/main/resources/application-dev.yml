@@ -1,0 +1,142 @@
+spring:
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      group-id: notification-delivery-group
+      auto-offset-reset: earliest
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.json.trusted.packages: "com.umesh.distributed_notification_service.*"
+        spring.json.value.default.type: com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+logging:
+  level:
+    root: INFO
+    com.umesh.distributed_notification_service: DEBUG
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+  endpoint:
+    health:
+      show-details: always
+
+notification:
+
+  retry:
+    max-attempts: 3
+    retry-delay-ms: 5000
+
+  email:
+    default-recipient: umeshmajjada88@gmail.com
+
+  sms:
+    default-recipient: +919440128127
+
+resilience4j:
+
+  circuitbreaker:
+
+    instances:
+
+      emailProvider:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      smsProvider:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      pushProvider:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+  ratelimiter:
+
+    instances:
+
+      emailProvider:
+
+        limitForPeriod: 10
+
+        limitRefreshPeriod: 1s
+
+        timeoutDuration: 0
+
+  bulkhead:
+
+    instances:
+
+      emailProvider:
+
+        maxConcurrentCalls: 10
+
+        maxWaitDuration: 0

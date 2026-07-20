@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Notification</title>
+
+</head>
+
+<body style="font-family:Arial,sans-serif;background:#f5f5f5;padding:40px;">
+
+    <div style="background:white;padding:30px;border-radius:8px;max-width:650px;margin:auto;">
+
+        <h2 style="color:#1565c0;">
+            Distributed Notification Platform
+        </h2>
+
+        <p>Hello,</p>
+
+        <p>You have received a new notification.</p>
+
+        <hr>
+
+        <h3 th:text="${subject}"></h3>
+
+        <p th:text="${message}"></p>
+
+        <hr>
+
+        <p style="color:gray;font-size:12px;">
+
+            Event Id:
+            <span th:text="${eventId}"></span>
+
+        </p>
+
+    </div>
+
+</body>
+
+</html>
