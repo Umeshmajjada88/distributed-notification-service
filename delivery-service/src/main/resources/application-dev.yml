@@ -46,9 +46,9 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 
-      properties:
-        spring.json.trusted.packages: "com.umesh.distributed_notification_service.*"
-        spring.json.value.default.type: com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent
+      # properties:
+      #   spring.json.trusted.packages: "com.umesh.distributed_notification_service.*"
+      #   spring.json.value.default.type: com.umesh.distributed_notification_service.domain.notification.event.dto.NotificationEvent
 
   data:
     redis:

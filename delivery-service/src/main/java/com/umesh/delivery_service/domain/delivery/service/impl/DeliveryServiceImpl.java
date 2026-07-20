@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -104,6 +105,55 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         return repository.findById(id)
                 .orElseThrow(() -> new DeliveryNotFoundException(id));
+
+    }
+
+    @Override
+    public Delivery incrementAttemptCount(Long deliveryId) {
+
+        Delivery delivery = getDelivery(deliveryId);
+
+        delivery.setAttemptCount(
+                delivery.getAttemptCount() + 1);
+
+        return repository.save(delivery);
+
+    }
+
+    @Override
+    public Delivery scheduleNextRetry(Long deliveryId) {
+
+        Delivery delivery = getDelivery(deliveryId);
+
+        delivery.setStatus(DeliveryStatus.PENDING);
+
+        return repository.save(delivery);
+
+    }
+
+    @Override
+    public Delivery save(Delivery delivery) {
+
+        return repository.save(delivery);
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Delivery> findById(Long deliveryId) {
+
+        return repository.findById(deliveryId);
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Delivery> findReadyForRetry(LocalDateTime now) {
+
+        return repository
+                .findTop100ByStatusAndNextRetryAtLessThanEqualOrderByNextRetryAtAsc(
+                        DeliveryStatus.RETRY_PENDING,
+                        now);
 
     }
 }

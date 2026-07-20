@@ -11,4 +11,6 @@ public final class KafkaTopics {
 
     public static final String NOTIFICATION_FAILED = "notification.failed";
 
+    public static final String NOTIFICATION_RETRY = "notification.retry";
+
 }

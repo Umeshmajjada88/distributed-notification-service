@@ -66,4 +66,7 @@ public class Delivery extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String message;
+
+    @Column(name = "next_retry_at")
+    private LocalDateTime nextRetryAt;
 }

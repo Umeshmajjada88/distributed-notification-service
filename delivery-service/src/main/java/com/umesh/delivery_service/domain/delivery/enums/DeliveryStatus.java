@@ -10,6 +10,6 @@ public enum DeliveryStatus {
 
     FAILED,
 
-    RETRYING
+    RETRY_PENDING
 
 }

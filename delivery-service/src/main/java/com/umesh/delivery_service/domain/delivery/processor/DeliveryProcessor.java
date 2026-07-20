@@ -5,7 +5,6 @@ import com.umesh.delivery_service.domain.delivery.enums.DeliveryStatus;
 import com.umesh.delivery_service.domain.delivery.service.DeliveryService;
 import com.umesh.delivery_service.domain.provider.factory.ProviderFactory;
 import com.umesh.delivery_service.domain.provider.interfaces.NotificationProvider;
-import com.umesh.shared.event.NotificationRequestedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,9 +18,7 @@ public class DeliveryProcessor {
 
     private final ProviderFactory providerFactory;
 
-    public void process(NotificationRequestedEvent event) {
-
-        Delivery delivery = deliveryService.createDelivery(event);
+    public void execute(Delivery delivery) {
 
         deliveryService.updateStatus(
                 delivery.getId(),
@@ -54,5 +51,7 @@ public class DeliveryProcessor {
                     ex.getMessage());
 
         }
+
     }
+
 }
