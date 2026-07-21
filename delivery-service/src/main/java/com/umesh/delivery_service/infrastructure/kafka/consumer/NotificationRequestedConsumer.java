@@ -15,7 +15,8 @@ public class NotificationRequestedConsumer {
 
     private final DeliveryOrchestrator orchestrator;
 
-    @KafkaListener(topics = KafkaTopics.NOTIFICATION_REQUESTED, groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = KafkaTopics.NOTIFICATION_REQUESTED, groupId = "${spring.kafka.consumer.group-id}", 
+    containerFactory = "notificationRequestedKafkaListenerContainerFactory")
     public void consume(NotificationRequestedEvent event) {
 
         log.info(

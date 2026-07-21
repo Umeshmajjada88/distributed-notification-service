@@ -1,26 +1,22 @@
 package com.umesh.delivery_service.common.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Getter
+@Value
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ErrorResponse {
 
-    private boolean success;
+    LocalDateTime timestamp;
 
-    private String message;
+    int status;
 
-    private List<ValidationError> errors;
+    String error;
 
-    @Builder.Default
-    private LocalDateTime timestamp = LocalDateTime.now();
+    String message;
+
+    String path;
 
 }

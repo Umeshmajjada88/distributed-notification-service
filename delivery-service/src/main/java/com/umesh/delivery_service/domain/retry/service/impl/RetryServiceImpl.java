@@ -1,5 +1,6 @@
 package com.umesh.delivery_service.domain.retry.service.impl;
 
+import com.umesh.delivery_service.domain.deadletter.service.DeadLetterService;
 import com.umesh.delivery_service.domain.delivery.entity.Delivery;
 import com.umesh.delivery_service.domain.delivery.enums.DeliveryStatus;
 import com.umesh.delivery_service.domain.delivery.processor.DeliveryProcessor;
@@ -29,6 +30,8 @@ public class RetryServiceImpl implements RetryService {
 
     private final DeliveryProcessor deliveryProcessor;
 
+    private final DeadLetterService deadLetterService;
+
 
 
     @Override
@@ -36,8 +39,10 @@ public class RetryServiceImpl implements RetryService {
 
         if (!retryPolicy.shouldRetry(delivery)) {
 
+            deadLetterService.saveFailedDelivery(delivery);
+
             log.warn(
-                    "Maximum retry attempts reached for delivery {}",
+                    "Delivery {} moved to Dead Letter Queue",
                     delivery.getId());
 
             return;

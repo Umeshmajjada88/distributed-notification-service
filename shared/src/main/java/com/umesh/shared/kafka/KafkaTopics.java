@@ -13,4 +13,6 @@ public final class KafkaTopics {
 
     public static final String NOTIFICATION_RETRY = "notification.retry";
 
+    public static final String NOTIFICATION_DLQ = "notification.dlq";
+
 }
