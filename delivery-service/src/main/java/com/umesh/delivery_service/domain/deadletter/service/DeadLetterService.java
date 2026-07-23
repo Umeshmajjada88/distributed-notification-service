@@ -1,5 +1,6 @@
 package com.umesh.delivery_service.domain.deadletter.service;
 
+import com.umesh.delivery_service.domain.deadletter.dto.response.DeadLetterResponse;
 import com.umesh.delivery_service.domain.deadletter.dto.response.DeadLetterStatisticsResponse;
 import com.umesh.delivery_service.domain.deadletter.entity.DeadLetter;
 import com.umesh.delivery_service.domain.delivery.entity.Delivery;
@@ -20,5 +21,7 @@ public interface DeadLetterService {
     List<DeadLetter> findPending();
 
     DeadLetterStatisticsResponse getStatistics();
+
+    List<DeadLetterResponse> getAllDeadLetters();
 
 }

@@ -11,24 +11,27 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class StompWebSocketPublisher
-        implements WebSocketPublisher {
+                implements WebSocketPublisher {
 
-    private final SimpMessagingTemplate messagingTemplate;
+        private final SimpMessagingTemplate messagingTemplate;
 
-    @Override
-    public void publish(NotificationStatusEvent event) {
-        log.info(
-                "Publishing WebSocket event: {}",
-                event);
-        messagingTemplate.convertAndSend(
-                "/topic/notifications",
-                event);
+        @Override
+        public void publish(NotificationStatusEvent event) {
 
-        log.info(
-                "Published WebSocket event for notification {} with status {}",
-                event.getNotificationId(),
-                event.getStatus());
+                log.info(
+                                "Publishing WebSocket event: {}",
+                                event);
 
-    }
+                messagingTemplate.convertAndSend(
+                                "/topic/notifications",
+                                event);
+
+                log.info(
+                                "Published WebSocket event for notification {} [{} -> {}]",
+                                event.getNotificationId(),
+                                event.getOldStatus(),
+                                event.getNewStatus());
+
+        }
 
 }

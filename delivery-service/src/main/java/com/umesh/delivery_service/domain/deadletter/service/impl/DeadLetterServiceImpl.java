@@ -1,8 +1,10 @@
 package com.umesh.delivery_service.domain.deadletter.service.impl;
 
+import com.umesh.delivery_service.domain.deadletter.dto.response.DeadLetterResponse;
 import com.umesh.delivery_service.domain.deadletter.dto.response.DeadLetterStatisticsResponse;
 import com.umesh.delivery_service.domain.deadletter.entity.DeadLetter;
 import com.umesh.delivery_service.domain.deadletter.enums.DeadLetterStatus;
+import com.umesh.delivery_service.domain.deadletter.mapper.DeadLetterMapper;
 import com.umesh.delivery_service.domain.deadletter.repository.DeadLetterRepository;
 import com.umesh.delivery_service.domain.deadletter.service.DeadLetterService;
 import com.umesh.delivery_service.domain.delivery.entity.Delivery;
@@ -33,6 +35,8 @@ public class DeadLetterServiceImpl implements DeadLetterService {
 
     private final NotificationStatusService notificationStatusService;
 
+    private final DeadLetterMapper deadLetterMapper;
+
     @Override
     public DeadLetter saveFailedDelivery(Delivery delivery) {
 
@@ -51,8 +55,10 @@ public class DeadLetterServiceImpl implements DeadLetterService {
         DeadLetter saved = deadLetterRepository.save(deadLetter);
 
         notificationStatusService.publishStatus(
-                delivery,
-                "Delivery moved to Dead Letter Queue");
+                        delivery,
+                        delivery.getStatus().name(),
+                        delivery.getStatus().name(),
+                        "Delivery moved to Dead Letter Queue");
 
         NotificationDeadLetterEvent event =
                 NotificationDeadLetterEvent.builder()
@@ -106,8 +112,10 @@ public class DeadLetterServiceImpl implements DeadLetterService {
         DeadLetter updated = deadLetterRepository.save(deadLetter);
 
         notificationStatusService.publishStatus(
-                delivery,
-                "Replay requested");
+                        delivery,
+                        delivery.getStatus().name(),
+                        delivery.getStatus().name(),
+                        "Replay requested");
 
         return updated;
 
@@ -122,15 +130,25 @@ public class DeadLetterServiceImpl implements DeadLetterService {
     }
 
     @Override
-public DeadLetterStatisticsResponse getStatistics() {
+        public DeadLetterStatisticsResponse getStatistics() {
 
-    return DeadLetterStatisticsResponse.builder()
-            .total(deadLetterRepository.count())
-            .pending(deadLetterRepository.countByStatus(DeadLetterStatus.PENDING))
-            .replayed(deadLetterRepository.countByStatus(DeadLetterStatus.REPLAYED))
-            .discarded(deadLetterRepository.countByStatus(DeadLetterStatus.DISCARDED))
-            .build();
+        return DeadLetterStatisticsResponse.builder()
+                .total(deadLetterRepository.count())
+                .pending(deadLetterRepository.countByStatus(DeadLetterStatus.PENDING))
+                .replayed(deadLetterRepository.countByStatus(DeadLetterStatus.REPLAYED))
+                .discarded(deadLetterRepository.countByStatus(DeadLetterStatus.DISCARDED))
+                .build();
 
-}
+        }
+
+        @Override
+        public List<DeadLetterResponse> getAllDeadLetters() {
+
+        return deadLetterRepository.findAll()
+                .stream()
+                .map(deadLetterMapper::toResponse)
+                .toList();
+
+        }
 
 }

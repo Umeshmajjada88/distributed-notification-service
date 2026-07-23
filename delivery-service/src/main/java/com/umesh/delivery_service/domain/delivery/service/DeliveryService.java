@@ -1,5 +1,6 @@
 package com.umesh.delivery_service.domain.delivery.service;
 
+import com.umesh.delivery_service.domain.delivery.dto.response.DeliveryResponse;
 import com.umesh.delivery_service.domain.delivery.dto.response.DeliveryStatisticsResponse;
 import com.umesh.delivery_service.domain.delivery.entity.Delivery;
 import com.umesh.delivery_service.domain.delivery.enums.DeliveryStatus;
@@ -33,5 +34,7 @@ public interface DeliveryService {
     List<Delivery> findReadyForRetry(LocalDateTime now);
 
     DeliveryStatisticsResponse getStatistics();
+
+    List<DeliveryResponse> getAllDeliveries();
 
 }

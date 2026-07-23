@@ -64,9 +64,15 @@ public class RetryServiceImpl implements RetryService {
 
         deliveryService.save(delivery);
 
+        String oldStatus = DeliveryStatus.FAILED.name();
+
         notificationStatusService.publishStatus(
-                delivery,
-                "Retry scheduled (Attempt " + delivery.getAttemptCount() + ")");
+                        delivery,
+                        oldStatus,
+                        delivery.getStatus().name(),
+                        "Retry scheduled (Attempt "
+                                        + delivery.getAttemptCount()
+                                        + ")");
 
 
         log.info(

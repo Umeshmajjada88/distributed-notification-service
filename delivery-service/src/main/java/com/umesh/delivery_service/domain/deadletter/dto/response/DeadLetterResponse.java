@@ -4,6 +4,7 @@ import com.umesh.delivery_service.domain.deadletter.enums.DeadLetterStatus;
 import com.umesh.shared.types.NotificationChannel;
 import lombok.Builder;
 import lombok.Value;
+import java.time.LocalDateTime;
 
 import java.util.UUID;
 
@@ -28,5 +29,7 @@ public class DeadLetterResponse {
     String failureReason;
 
     DeadLetterStatus status;
+
+    LocalDateTime createdAt;
 
 }

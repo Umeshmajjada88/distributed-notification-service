@@ -20,11 +20,23 @@ public class NotificationStatusServiceImpl
 
     @Override
     public void publishStatus(
+
             Delivery delivery,
+
+            String oldStatus,
+
+            String newStatus,
+
             String message) {
 
         NotificationStatusEvent event = notificationStatusMapper.toEvent(
+
                 delivery,
+
+                oldStatus,
+
+                newStatus,
+
                 message);
 
         webSocketPublisher.publish(event);

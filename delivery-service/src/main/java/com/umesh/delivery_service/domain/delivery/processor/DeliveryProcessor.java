@@ -25,58 +25,79 @@ public class DeliveryProcessor {
 
     public void execute(Delivery delivery) {
 
-        deliveryService.updateStatus(
-                delivery.getId(),
-                DeliveryStatus.IN_PROGRESS);
+            /*
+             * PENDING -> IN_PROGRESS
+             */
+            String oldStatus = delivery.getStatus().name();
 
-        delivery = deliveryService.findById(delivery.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
-
-        notificationStatusService.publishStatus(
-                delivery,
-                "Delivery started");
-
-        try {
-
-            NotificationProvider provider = providerFactory.getProvider(
-                    delivery.getProvider());
-
-            provider.send(delivery);
-
-            deliveryService.markDelivered(
-                    delivery.getId(),
-                    "LOCAL-DEMO-" + delivery.getId());
+            deliveryService.updateStatus(
+                            delivery.getId(),
+                            DeliveryStatus.IN_PROGRESS);
 
             delivery = deliveryService.findById(delivery.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
+                            .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
 
             notificationStatusService.publishStatus(
-                    delivery,
-                    "Notification delivered successfully");
+                            delivery,
+                            oldStatus,
+                            delivery.getStatus().name(),
+                            "Delivery started");
 
-            log.info(
-                    "Delivery {} completed successfully",
-                    delivery.getId());
+            try {
 
-        } catch (Exception ex) {
+                    NotificationProvider provider = providerFactory.getProvider(
+                                    delivery.getProvider());
 
-            log.error(
-                    "Delivery {} failed",
-                    delivery.getId(),
-                    ex);
+                    provider.send(delivery);
 
-            deliveryService.markFailed(
-                    delivery.getId(),
-                    ex.getMessage());
+                    /*
+                     * IN_PROGRESS -> DELIVERED
+                     */
+                    oldStatus = delivery.getStatus().name();
 
-            delivery = deliveryService.findById(delivery.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
+                    deliveryService.markDelivered(
+                                    delivery.getId(),
+                                    "LOCAL-DEMO-" + delivery.getId());
 
-            notificationStatusService.publishStatus(
-                    delivery,
-                    "Delivery failed: " + ex.getMessage());
+                    delivery = deliveryService.findById(delivery.getId())
+                                    .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
 
-        }
+                    notificationStatusService.publishStatus(
+                                    delivery,
+                                    oldStatus,
+                                    delivery.getStatus().name(),
+                                    "Notification delivered successfully");
+
+                    log.info(
+                                    "Delivery {} completed successfully",
+                                    delivery.getId());
+
+            } catch (Exception ex) {
+
+                    log.error(
+                                    "Delivery {} failed",
+                                    delivery.getId(),
+                                    ex);
+
+                    /*
+                     * IN_PROGRESS -> FAILED
+                     */
+                    oldStatus = delivery.getStatus().name();
+
+                    deliveryService.markFailed(
+                                    delivery.getId(),
+                                    ex.getMessage());
+
+                    delivery = deliveryService.findById(delivery.getId())
+                                    .orElseThrow(() -> new ResourceNotFoundException("Delivery not found"));
+
+                    notificationStatusService.publishStatus(
+                                    delivery,
+                                    oldStatus,
+                                    delivery.getStatus().name(),
+                                    "Delivery failed: " + ex.getMessage());
+
+            }
 
     }
 

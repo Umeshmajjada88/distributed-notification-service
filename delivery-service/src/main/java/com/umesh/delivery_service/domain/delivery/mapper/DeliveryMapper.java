@@ -1,5 +1,6 @@
 package com.umesh.delivery_service.domain.delivery.mapper;
 
+import com.umesh.delivery_service.domain.delivery.dto.response.DeliveryResponse;
 import com.umesh.delivery_service.domain.delivery.entity.Delivery;
 import com.umesh.delivery_service.domain.delivery.enums.DeliveryProvider;
 import com.umesh.delivery_service.domain.delivery.enums.DeliveryStatus;
@@ -22,5 +23,22 @@ public class DeliveryMapper {
                 .status(DeliveryStatus.PENDING)
                 .attemptCount(0)
                 .build();
+    }
+
+    public DeliveryResponse toResponse(Delivery delivery) {
+
+        return DeliveryResponse.builder()
+                .id(delivery.getId())
+                .notificationId(delivery.getNotificationId())
+                .eventId(delivery.getEventId())
+                .provider(delivery.getProvider().name())
+                .status(delivery.getStatus())
+                .attemptCount(delivery.getAttemptCount())
+                .failureReason(delivery.getFailureReason())
+                .nextRetryAt(delivery.getNextRetryAt())
+                .createdAt(delivery.getCreatedAt())
+                .updatedAt(delivery.getUpdatedAt())
+                .build();
+
     }
 }

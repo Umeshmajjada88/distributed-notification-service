@@ -1,5 +1,5 @@
 import {
-
+    CircularProgress,
     Paper,
     Table,
     TableBody,
@@ -7,16 +7,12 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    CircularProgress,
     Typography
-
 } from "@mui/material";
 
+import { useDeadLetters } from "../../hooks/useDeadLetters";
 
-import { useNotifications } from "../../hooks/useNotifications";
-
-
-export default function RecentNotificationsTable() {
+export default function RecentDeadLettersTable() {
 
     const {
 
@@ -26,7 +22,7 @@ export default function RecentNotificationsTable() {
 
         error
 
-    } = useNotifications();
+    } = useDeadLetters();
 
     if (isLoading) {
 
@@ -40,7 +36,7 @@ export default function RecentNotificationsTable() {
 
             <Typography color="error">
 
-                Unable to load notifications.
+                Unable to load dead letters.
 
             </Typography>
 
@@ -62,9 +58,11 @@ export default function RecentNotificationsTable() {
 
                         <TableCell>Channel</TableCell>
 
+                        <TableCell>Provider</TableCell>
+
                         <TableCell>Status</TableCell>
 
-                        <TableCell>Subject</TableCell>
+                        <TableCell>Failure Reason</TableCell>
 
                         <TableCell>Created</TableCell>
 
@@ -74,39 +72,44 @@ export default function RecentNotificationsTable() {
 
                 <TableBody>
 
-                    {(data ?? []).map((notification) => (
+                    {(data ?? []).map((deadLetter) => (
 
-                        <TableRow
-                            key={notification.id}>
+                        <TableRow key={deadLetter.id}>
 
                             <TableCell>
 
-                                {notification.id}
+                                {deadLetter.id}
 
                             </TableCell>
 
                             <TableCell>
 
-                                {notification.channel}
+                                {deadLetter.channel}
 
                             </TableCell>
 
                             <TableCell>
 
-                                {notification.status}
+                                {deadLetter.provider}
 
                             </TableCell>
 
                             <TableCell>
 
-                                {notification.subject}
+                                {deadLetter.status}
+
+                            </TableCell>
+
+                            <TableCell>
+
+                                {deadLetter.failureReason}
 
                             </TableCell>
 
                             <TableCell>
 
                                 {new Date(
-                                    notification.createdAt
+                                    deadLetter.createdAt
                                 ).toLocaleString()}
 
                             </TableCell>

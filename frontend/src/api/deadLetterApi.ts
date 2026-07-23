@@ -1,13 +1,22 @@
 import api from "./axios";
 import { API_CONFIG } from "../config/api";
+import type { DeadLetter } from "../types/DeadLetter";
 
 export async function getDeadLetterStatistics() {
 
-    const url = `${API_CONFIG.delivery}/api/v1/dead-letters/statistics`;
+    const response = await api.get(
+        `${API_CONFIG.delivery}/api/v1/dead-letters/statistics`
+    );
 
-    console.log("Calling:", url);
+    return response.data;
 
-    const response = await api.get(url);
+}
+
+export async function getDeadLetters(): Promise<DeadLetter[]> {
+
+    const response = await api.get(
+        `${API_CONFIG.delivery}/api/v1/dead-letters`
+    );
 
     return response.data;
 

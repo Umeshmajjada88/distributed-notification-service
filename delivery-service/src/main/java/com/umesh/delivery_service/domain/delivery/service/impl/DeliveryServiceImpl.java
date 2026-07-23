@@ -1,6 +1,7 @@
 package com.umesh.delivery_service.domain.delivery.service.impl;
 
 import com.umesh.delivery_service.common.exception.DeliveryNotFoundException;
+import com.umesh.delivery_service.domain.delivery.dto.response.DeliveryResponse;
 import com.umesh.delivery_service.domain.delivery.dto.response.DeliveryStatisticsResponse;
 import com.umesh.delivery_service.domain.delivery.entity.Delivery;
 import com.umesh.delivery_service.domain.delivery.enums.DeliveryStatus;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,26 +26,28 @@ import java.util.UUID;
 @Transactional
 public class DeliveryServiceImpl implements DeliveryService {
 
-    private final DeliveryRepository repository;
+    private final DeliveryRepository deliveryRepository;
 
-    private final DeliveryMapper mapper;
+    
+
+    private final DeliveryMapper deliveryMapper;
 
     @Override
     public Delivery createDelivery(NotificationRequestedEvent event) {
 
-        if (repository.existsByEventId(event.getEventId())) {
+        if (deliveryRepository.existsByEventId(event.getEventId())) {
 
             log.warn(
                     "Duplicate event received. eventId={}",
                     event.getEventId());
 
-            return repository.findByEventId(event.getEventId())
+            return deliveryRepository.findByEventId(event.getEventId())
                     .orElseThrow();
         }
 
-        Delivery delivery = mapper.toEntity(event);
+        Delivery delivery = deliveryMapper.toEntity(event);
 
-        Delivery saved = repository.save(delivery);
+        Delivery saved = deliveryRepository.save(delivery);
 
         log.info(
                 "Delivery {} created successfully",
@@ -61,7 +65,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         delivery.setStatus(status);
 
-        return repository.save(delivery);
+        return deliveryRepository.save(delivery);
     }
 
     @Override
@@ -77,7 +81,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         delivery.setProviderMessageId(providerMessageId);
 
-        return repository.save(delivery);
+        return deliveryRepository   .save(delivery);
     }
 
     @Override
@@ -91,20 +95,20 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         delivery.setFailureReason(reason);
 
-        return repository.save(delivery);
+        return deliveryRepository.save(delivery);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Delivery> findByEventId(UUID eventId) {
 
-        return repository.findByEventId(eventId);
+        return deliveryRepository.findByEventId(eventId);
 
     }
 
     private Delivery getDelivery(Long id) {
 
-        return repository.findById(id)
+        return deliveryRepository.findById(id)
                 .orElseThrow(() -> new DeliveryNotFoundException(id));
 
     }
@@ -117,7 +121,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         delivery.setAttemptCount(
                 delivery.getAttemptCount() + 1);
 
-        return repository.save(delivery);
+        return deliveryRepository.save(delivery);
 
     }
 
@@ -128,14 +132,14 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         delivery.setStatus(DeliveryStatus.PENDING);
 
-        return repository.save(delivery);
+        return deliveryRepository.save(delivery);
 
     }
 
     @Override
     public Delivery save(Delivery delivery) {
 
-        return repository.save(delivery);
+        return deliveryRepository.save(delivery);
 
     }
 
@@ -143,7 +147,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Transactional(readOnly = true)
     public Optional<Delivery> findById(Long deliveryId) {
 
-        return repository.findById(deliveryId);
+        return deliveryRepository.findById(deliveryId);
 
     }
 
@@ -151,7 +155,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Transactional(readOnly = true)
     public List<Delivery> findReadyForRetry(LocalDateTime now) {
 
-        return repository
+        return deliveryRepository  
                 .findTop100ByStatusAndNextRetryAtLessThanEqualOrderByNextRetryAtAsc(
                         DeliveryStatus.RETRY_PENDING,
                         now);
@@ -162,13 +166,23 @@ public class DeliveryServiceImpl implements DeliveryService {
     public DeliveryStatisticsResponse getStatistics() {
 
         return DeliveryStatisticsResponse.builder()
-                .total(repository.count())
-                .pending(repository.countByStatus(DeliveryStatus.PENDING))
-                .inProgress(repository.countByStatus(DeliveryStatus.IN_PROGRESS))
-                .retryPending(repository.countByStatus(DeliveryStatus.RETRY_PENDING))
-                .delivered(repository.countByStatus(DeliveryStatus.DELIVERED))
-                .failed(repository.countByStatus(DeliveryStatus.FAILED))
+                .total(deliveryRepository.count())
+                .pending(deliveryRepository.countByStatus(DeliveryStatus.PENDING))
+                .inProgress(deliveryRepository.countByStatus(DeliveryStatus.IN_PROGRESS))
+                .retryPending(deliveryRepository.countByStatus(DeliveryStatus.RETRY_PENDING))
+                .delivered(deliveryRepository.countByStatus(DeliveryStatus.DELIVERED))
+                .failed(deliveryRepository.countByStatus(DeliveryStatus.FAILED))
                 .build();
+
+    }
+
+    @Override
+    public List<DeliveryResponse> getAllDeliveries() {
+
+        return deliveryRepository.findAll()
+                .stream()
+                .map(deliveryMapper::toResponse)
+                .toList();
 
     }
 }

@@ -6,16 +6,21 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Value
 @Builder
 public class NotificationStatusEvent {
 
+    UUID eventId;
+
     Long notificationId;
 
     Long deliveryId;
 
-    String status;
+    String oldStatus;
+
+    String newStatus;
 
     NotificationChannel channel;
 

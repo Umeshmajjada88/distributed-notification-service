@@ -1,5 +1,5 @@
 import {
-
+    CircularProgress,
     Paper,
     Table,
     TableBody,
@@ -7,45 +7,29 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    CircularProgress,
     Typography
-
 } from "@mui/material";
 
+import { useDeliveries } from "../../hooks/useDeliveries";
 
-import { useNotifications } from "../../hooks/useNotifications";
-
-
-export default function RecentNotificationsTable() {
+export default function RecentDeliveriesTable() {
 
     const {
-
         data,
-
         isLoading,
-
         error
-
-    } = useNotifications();
+    } = useDeliveries();
 
     if (isLoading) {
-
         return <CircularProgress />;
-
     }
 
     if (error) {
-
         return (
-
             <Typography color="error">
-
-                Unable to load notifications.
-
+                Unable to load deliveries.
             </Typography>
-
         );
-
     }
 
     return (
@@ -60,13 +44,13 @@ export default function RecentNotificationsTable() {
 
                         <TableCell>ID</TableCell>
 
-                        <TableCell>Channel</TableCell>
+                        <TableCell>Provider</TableCell>
 
                         <TableCell>Status</TableCell>
 
-                        <TableCell>Subject</TableCell>
+                        <TableCell>Attempts</TableCell>
 
-                        <TableCell>Created</TableCell>
+                        <TableCell>Updated</TableCell>
 
                     </TableRow>
 
@@ -74,41 +58,30 @@ export default function RecentNotificationsTable() {
 
                 <TableBody>
 
-                    {(data ?? []).map((notification) => (
+                    {(data ?? []).map((delivery) => (
 
-                        <TableRow
-                            key={notification.id}>
+                        <TableRow key={delivery.id}>
 
                             <TableCell>
-
-                                {notification.id}
-
+                                {delivery.id}
                             </TableCell>
 
                             <TableCell>
-
-                                {notification.channel}
-
+                                {delivery.provider}
                             </TableCell>
 
                             <TableCell>
-
-                                {notification.status}
-
+                                {delivery.status}
                             </TableCell>
 
                             <TableCell>
-
-                                {notification.subject}
-
+                                {delivery.attemptCount}
                             </TableCell>
 
                             <TableCell>
-
                                 {new Date(
-                                    notification.createdAt
+                                    delivery.updatedAt
                                 ).toLocaleString()}
-
                             </TableCell>
 
                         </TableRow>

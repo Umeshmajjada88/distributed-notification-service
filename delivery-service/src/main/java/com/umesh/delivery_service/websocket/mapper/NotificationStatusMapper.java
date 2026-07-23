@@ -10,17 +10,35 @@ import java.time.LocalDateTime;
 public class NotificationStatusMapper {
 
     public NotificationStatusEvent toEvent(
+
             Delivery delivery,
+
+            String oldStatus,
+
+            String newStatus,
+
             String message) {
 
         return NotificationStatusEvent.builder()
+
+                .eventId(delivery.getEventId())
+
                 .notificationId(delivery.getNotificationId())
+
                 .deliveryId(delivery.getId())
-                .status(delivery.getStatus().name())
+
+                .oldStatus(oldStatus)
+
+                .newStatus(newStatus)
+
                 .channel(delivery.getChannel())
+
                 .provider(delivery.getProvider())
+
                 .message(message)
+
                 .timestamp(LocalDateTime.now())
+
                 .build();
 
     }
